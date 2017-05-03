@@ -1,0 +1,25 @@
+{
+  "name": "NapEasy-ANN",
+  "manifest_version": 2,
+  "version": "1.0",
+  "description": "NapEasy Annotator",
+  "icons": {"128": "wr.png"},
+  "browser_action": {
+    "default_icon": "wr.png",
+    "default_title": "NEA"
+  },
+  "content_security_policy": "script-src 'self' https://napeasy.org; object-src 'self'",
+  "background": {
+    "scripts": ["libs/jquery-latest.pack.js", "libs/jquery.json-2.2.min.js", "wr.js", "api.js"],
+    "persistent": false
+  },
+  "permissions": [
+    "cookies", "tabs", "http://napeasy.org/"
+  ],
+  "web_accessible_resources": [ "spr.css" ],
+  "content_scripts": [ {
+      "js": [ "libs/jquery-latest.pack.js", "libs/jquery.json-2.2.min.js", "libs/md5.js", "pageAnalyzer.js", "content.js" ],
+      "css":["spr.css"],
+      "matches": [ "\u003Call_urls\u003E" ]
+   } ]
+}
