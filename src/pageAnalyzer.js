@@ -8,6 +8,7 @@ wr.PageAnalyzer = function(){
 	this.htOn = false;
 	this.init();
 	this.highlights = {};
+	this.loc2highlights = {};
 };
 
 chrome.runtime.onMessage.addListener(
@@ -22,12 +23,15 @@ chrome.runtime.onMessage.addListener(
 
 //initailisation function
 wr.PageAnalyzer.prototype.init = function(){
-	$('body').append('<div id="nea_menu"><span id="nea_logo">Napeasy Annotator<br/>PHI Kings College London</span> <div id="nea_message"></div></div>');
+	$('body').append('<div id="nea_menu"><span id="nea_logo">Napeasy Annotator<br/>PHI Kings College London</span> <div id="nea_message"></div> <button id="btnClear">Clear</button></div>');
 	$('body').append('<div id="nea_pop"><input type="text"/><span id="btnOk">ok</span><span id="btnDel">del</span></div>');
 	var thisObj = this;
 
-	$('#btnRender').click(function(){
-		thisObj.rerender();
+	$('#btnClear').click(function(){
+		var confirmed = confirm("Clear all? Sure?");
+		if (confirmed){
+			thisObj.clearHighlighting();
+		}
 	});
 	$('#nea_pop input').keyup(function(e){
 		if (e.which == 13){
@@ -79,7 +83,7 @@ wr.PageAnalyzer.prototype.toggleHt = function(){
 		this.requestAnns();
 	}else{
 		$('#nea_menu').hide();
-		this.clearHighlighting();
+		this.clearHighlighting(true);
 	}
 }
 
@@ -110,8 +114,9 @@ wr.PageAnalyzer.prototype.getSelection = function(){
 		var selectObject = {"selected": selected, "meta": ""};
 		selectObject.id = this.getMD5HtObject(selectObject);
 		console.log(selectObject);
-		this.highlighting(selectObject);
-		this.highlights[selectObject.id] = selectObject;
+		// this.highlighting(selectObject);
+		this.highlights[selectObject.id] = selectObject;		
+		this.highlightingAll();
 		this.showMessage('highlight created');
 		this.save();
 	}
@@ -137,10 +142,26 @@ wr.PageAnalyzer.prototype.getSelectedObject = function(node, start, end){
 wr.PageAnalyzer.prototype.getHTObject = function(elem, loc, start, end){
 	var index = -1;
 	var o = {"type": "node", "loc": loc, "index": index, "start": start, "end":end};
+	var nearestHt = null;
+	var totalPrevHt = 0;
+	var thisObj = this;
 	if (elem.nodeType == 3){
 		$(loc).contents().each(function(idx){
+			if ($(this).hasClass('nea_ht')){
+				nearestHt = thisObj.highlights[$(this).attr('nea_ht_id')];
+				totalPrevHt++;
+			}else if ($(this).get(0).nodeType != 3){
+				nearestHt = null;
+			}
 			if (elem == this){
 				index = idx;
+				o.r_index = idx - 2 * totalPrevHt;
+				var offset = 0;
+				if (nearestHt!=null){
+					offset = nearestHt.selected[0].r_end;
+				}
+				o.r_start = o.start + offset;
+				o.r_end = o.end + offset;
 			}
 		});
 		o.index = index;
@@ -260,6 +281,109 @@ wr.PageAnalyzer.prototype.highlighting = function(obj){
 
 };
 
+wr.PageAnalyzer.prototype.highlightingAll = function(){
+
+	//clear all current highlighting
+	this.clearHighlighting(true);
+
+	//do highlighting in the DOM object oriented way
+	var dom2htObjs = {};
+	for (var htId in this.highlights){
+		var htObjs = this.highlights[htId].selected;
+		//select objects before doing actual highlighting to avoid 
+		// potential messed ups of inserted elements.
+		for(var i=0;i<htObjs.length;i++){
+			if (htObjs[i].type == "node")
+				htObjs[i].obj = $(htObjs[i].loc);
+			else{
+				$(htObjs[i].loc).contents().each(function(index){
+					if (index == htObjs[i].r_index){
+						var obj = $(this).get(0);
+						var objHash = htObjs[i].loc + " " + index;
+						htObjs[i].obj = obj;
+						htObjs[i].htId = htId;
+						if (objHash in dom2htObjs){
+							dom2htObjs[objHash].push(htObjs[i]);
+						}else{
+							dom2htObjs[objHash] = [htObjs[i]];
+						}
+					}
+				});
+			}
+		}
+	}
+	for (var dom in dom2htObjs){
+		var htObjs = dom2htObjs[dom].sort(function(a, b){
+			return a.r_start - b.r_start;
+		});
+		var domObj = htObjs[0].obj;
+
+		var prevEnd = 0;
+		var newDomList = [];
+		for(var i=0;i<htObjs.length;i++){
+			var ho = htObjs[i];
+			if (ho.type == "node"){
+				//htObjs[i].obj.css('background', 'red');
+			}else{
+				var s = ho.r_start;
+				var e = ho.r_end;
+				if (s > prevEnd){
+					var preText = document.createTextNode(domObj.nodeValue.substring(prevEnd, s));
+					newDomList.push(preText);
+				}				
+				var htText = document.createElement("em");
+				$(htText).addClass('nea_ht');
+				$(htText).addClass(ho.htId);
+				$(htText).attr("nea_ht_id", ho.htId);
+				htText.innerText = domObj.nodeValue.substring(s, e);
+				newDomList.push(htText);
+
+				prevEnd = e;
+			}
+		}
+		if (domObj.nodeType == 3){
+			if (prevEnd < domObj.nodeValue.length){
+				var sufText = document.createTextNode(domObj.nodeValue.substring(prevEnd, domObj.nodeValue.length));
+				newDomList.push(sufText);
+			}
+		}
+
+		var prevDom = domObj;
+		for(var i=0;i<newDomList.length;i++){
+			var newDom = newDomList[i];
+			$(newDom).insertAfter(prevDom);
+			if ($(newDom).hasClass('nea_ht')){
+				var htObj = this.highlights[$(newDom).attr('nea_ht_id')]['selected'][0];
+				var h = $(newDom).height();
+				$(newDom).append('<span class="nea_label"></span>');
+				$(newDom).find('.nea_label').html(this.highlights[$(newDom).attr('nea_ht_id')].meta);
+				$(newDom).find('.nea_label').css('bottom', h);
+			}
+			prevDom = newDom;
+		}
+		domObj.parentNode.removeChild(domObj);
+	}
+
+	var thisObj = this;
+	$('.nea_ht').mouseover(function(){
+		if ($(this).find('#nea_pop').length > 0){
+			$('#nea_pop').show();
+		}else{
+			$('.' + $(this).attr('nea_ht_id') + ':eq(0)').append($('#nea_pop'));
+			$('#nea_pop').css("bottom", $('.' + $(this).attr('nea_ht_id') + ':eq(0)').height());
+			$('#nea_pop').show();
+			$('#nea_pop input').val(thisObj.highlights[$(this).attr('nea_ht_id')].meta);
+		}
+		$(this).addClass('nea_hover');
+		
+	});
+	$('.nea_ht').mouseout(function(){
+		$(this).removeClass('nea_hover');
+		$('#nea_pop').hide();
+	});
+
+};
+
 //delete a highlighting
 wr.PageAnalyzer.prototype.deleteHt = function(htId, keepObj){
 	$('#nea_pop').hide();
@@ -282,17 +406,23 @@ wr.PageAnalyzer.prototype.deleteHt = function(htId, keepObj){
 	}
 }
 
-wr.PageAnalyzer.prototype.clearHighlighting = function(){
-	for(var id in this.highlights){
-		this.deleteHt(id, true);
+wr.PageAnalyzer.prototype.clearHighlighting = function(keepData){
+	if (keepData){
+		for(var id in this.highlights){
+			this.deleteHt(id, true);
+		}
+	}else{
+		this.highlights = {};
+		this.save();
 	}
 }
 
 wr.PageAnalyzer.prototype.rerender = function(){
-	this.clearHighlighting();
-	for(var id in this.highlights){
-		this.highlighting(this.highlights[id]);
-	}
+	this.clearHighlighting(true);
+	this.highlightingAll();
+	// for(var id in this.highlights){
+	// 	this.highlighting(this.highlights[id]);
+	// }
 }
 
 var _pageAnalyzer = null;
