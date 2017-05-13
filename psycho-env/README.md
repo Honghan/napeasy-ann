@@ -19,7 +19,6 @@ Url	Domain
 https://www.ncbi.nlm.nih.gov/pubmed/11223110	Sunlight to bipolar disorder
 https://www.ncbi.nlm.nih.gov/pubmed/12467954	Sunlight to bipolar disorder
 ...
-
 ```
 
 2. [annotation dump](annotations_v1.0.tsv) - contains the annotations on all articles and takes the following format.
