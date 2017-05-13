@@ -1,0 +1,7 @@
+Autoregressive Integrated Moving Average (ARIMA) method
+Logistic regression
+Multiple linear regression analysis
+Regression models and correlations
+Young Mania Rating Scale (YMRS)
+a base model
+validated six-item screener questionnaire
