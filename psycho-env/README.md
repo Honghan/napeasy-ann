@@ -12,7 +12,16 @@ web pages, it has been developed and tested on PubMed articles.
 As with other diseases, it has been established that mental illnesses are influenced in their origins and pathology by environmental factors. For example, it has been found that higher rates of schizophrenia occur in people of Caribbean origin than ethnically similar white people living in the UK [1]. To date, no complete list of environmental factors for all existing mental illnesses has been compiled that can be used for patient screening and planning treatment strategies [2].
 
 ## Corpus Files
-### [annotation dump](annotations_v1.0.tsv) - contains the annotations on all articles and takes the following format.
+1. [20 articles covering 4 sub-domains](20_articles.tsv) - lists the 20 articles and their sub-domains.
+The file is tab separated.
+```
+Url	Domain
+https://www.ncbi.nlm.nih.gov/pubmed/11223110	Sunlight to bipolar disorder
+https://www.ncbi.nlm.nih.gov/pubmed/12467954	Sunlight to bipolar disorder
+
+```
+
+2. [annotation dump](annotations_v1.0.tsv) - contains the annotations on all articles and takes the following format.
 
 The first line is the article url, which follows by a list of annotations of this article (each row describes one annotation).
 ```csv
