@@ -18,6 +18,7 @@ The file is tab separated.
 Url	Domain
 https://www.ncbi.nlm.nih.gov/pubmed/11223110	Sunlight to bipolar disorder
 https://www.ncbi.nlm.nih.gov/pubmed/12467954	Sunlight to bipolar disorder
+...
 
 ```
 
@@ -29,6 +30,7 @@ https://www.ncbi.nlm.nih.gov/pubmed/12823078
 ABSTRACTTEXT:eq(1)	0	589	624	3 times a day during the first week	Data collection method
 ABSTRACTTEXT:eq(2)	0	0	160	All outcome measures showed significantly (p <.05) better mood improvement in light-treated patients, resulting in faster responses to antidepressant treatment.	The conclusion/finding
 ABSTRACTTEXT:eq(1)	0	231	290	 placebo (exposure to a deactivated negative ion generator)	controlled group treatment
+...
 ```
 Essentially, the annotation line is tab-separated and has 6 columns. The columns are explained as follows.
 
