@@ -12,18 +12,18 @@ web pages, it has been developed and tested on PubMed articles.
 As with other diseases, it has been established that mental illnesses are influenced in their origins and pathology by environmental factors. For example, it has been found that higher rates of schizophrenia occur in people of Caribbean origin than ethnically similar white people living in the UK [1]. To date, no complete list of environmental factors for all existing mental illnesses has been compiled that can be used for patient screening and planning treatment strategies [2].
 
 ## Corpus Files
-[annotation dump](annotations_v1.0.tsv) - contains the annotations on all articles and takes the following format.
+### [annotation dump](annotations_v1.0.tsv) - contains the annotations on all articles and takes the following format.
 
-The first line is the article url as follows.
+The first line is the article url, which follows by a list of annotations of this article (each row describes one annotation).
 ```csv
 https://www.ncbi.nlm.nih.gov/pubmed/12823078
-```
-Each line in the following block is an annotation.
-| Option | Description | | ------ | ----------- | | data | path to data files to supply the data that will be passed into templates. | | engine | engine to be used for processing templates. Handlebars is the default. | | ext | extension to be used for dest files. |
-```tsv
 ABSTRACTTEXT:eq(1)	0	589	624	3 times a day during the first week	Data collection method
-
 ```
+Essentially, the annotation line is tab-separated and has 6 columns. The columns are explained as follows.
+
+| Parent node selector | Text Node Index | Start Offset | End Offset | Text | Type |
+| -------------------- | --------------- | ------------ | ---------- | ---- | ---- |
+| ABSTRACTTEXT:eq(1) | 0 | 589 | 624 | 3 times a day during the first week | Data collection method |
 
 
 ### Reference
