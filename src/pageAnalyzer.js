@@ -23,7 +23,12 @@ chrome.runtime.onMessage.addListener(
 
 //initailisation function
 wr.PageAnalyzer.prototype.init = function(){
-	$('body').append('<div id="nea_menu"><span id="nea_logo">Napeasy Annotator<br/>PHI Kings College London</span> <div id="nea_message"></div> <button id="btnClear">Clear</button></div>');
+	this.removePubmedHts();
+	$('body').append('<div id="nea_menu"><span id="nea_logo">Napeasy Annotator<br/>PHI Kings College London</span> <div id="nea_message"></div>' + 
+		//' <div class="nea_ctls"><label for="txtAnnotator">Annotator:</label> <input type="text" id="txtAnnotator" value="kclMScProject2017"/> <button id="btnSetAnt">set</button>' +
+		' <button id="btnClear">Remove All Annotations</button></div>'
+		//' </div>'
+		);
 	$('body').append('<div id="nea_pop"><input type="text"/><span id="btnOk">ok</span><span id="btnDel">del</span></div>');
 	var thisObj = this;
 
@@ -51,6 +56,11 @@ wr.PageAnalyzer.prototype.init = function(){
 		var htId = $(this).closest('.nea_ht').attr('nea_ht_id');
 		thisObj.deleteHt(htId);
 	});
+	// $('#btnSetAnt').click(function(){
+	// 	chrome.runtime.sendMessage({action: "setAnn", data: {annotator: $('#txtAnnotator').val()}}, function(response) {
+	// 	    thisObj.showMessage('setting annotations...');
+	// 	});
+	// });
 }
 
 wr.PageAnalyzer.prototype.requestAnns = function(){
@@ -143,19 +153,23 @@ wr.PageAnalyzer.prototype.getHTObject = function(elem, loc, start, end){
 	var index = -1;
 	var o = {"type": "node", "loc": loc, "index": index, "start": start, "end":end};
 	var nearestHt = null;
-	var totalPrevHt = 0;
+	var totalSplit = 0;
 	var thisObj = this;
 	if (elem.nodeType == 3){
+		var prevElem = null;
 		$(loc).contents().each(function(idx){
 			if ($(this).hasClass('nea_ht')){
 				nearestHt = thisObj.highlights[$(this).attr('nea_ht_id')];
-				totalPrevHt++;
+				if (!prevElem || prevElem.nodeType != 3)
+					totalSplit++;
+				else
+					totalSplit += 2;
 			}else if ($(this).get(0).nodeType != 3){
 				nearestHt = null;
 			}
 			if (elem == this){
 				index = idx;
-				o.r_index = idx - 2 * totalPrevHt;
+				o.r_index = idx - totalSplit;
 				var offset = 0;
 				if (nearestHt!=null){
 					offset = nearestHt.selected[0].r_end;
@@ -163,6 +177,7 @@ wr.PageAnalyzer.prototype.getHTObject = function(elem, loc, start, end){
 				o.r_start = o.start + offset;
 				o.r_end = o.end + offset;
 			}
+			prevElem = this;
 		});
 		o.index = index;
 		o.type = "textNode";
@@ -194,7 +209,12 @@ wr.PageAnalyzer.prototype.getLocatorByAttrs = function(elem){
 	for(var i=0;i<this.locAttrs.length;i++){
 		attr = this.locAttrs[i];
 		if ($(node).attr(attr) && $(node).attr(attr).length > 0){
-			loc = tagName + " [" + attr + "='" + $(node).attr(attr) + "']";
+			if (attr == "class"){
+				loc = tagName + "." + $(node).attr(attr);
+			}else if (attr == "id"){
+				loc = "#" + $(node).attr(attr);
+			}else
+				loc = tagName + " [" + attr + "='" + $(node).attr(attr) + "']";
 			break;
 		}
 	}
@@ -302,6 +322,8 @@ wr.PageAnalyzer.prototype.highlightingAll = function(){
 						var objHash = htObjs[i].loc + " " + index;
 						htObjs[i].obj = obj;
 						htObjs[i].htId = htId;
+						if (!htObjs[i].text)
+							htObjs[i].text = this.nodeValue.substring(htObjs[i].r_start, htObjs[i].r_end);
 						if (objHash in dom2htObjs){
 							dom2htObjs[objHash].push(htObjs[i]);
 						}else{
@@ -406,12 +428,26 @@ wr.PageAnalyzer.prototype.deleteHt = function(htId, keepObj){
 	}
 }
 
+//remove pubmed highlights
+wr.PageAnalyzer.prototype.removePubmedHts = function(htId, keepObj){
+	$('.highlight').each(function(){
+		var text = "";
+		$(this).contents().each(function(){
+			text += $(this).text();
+		});
+		var txtNode = document.createTextNode(text);
+		$(txtNode).insertAfter($(this));
+		var p = $(this).parent().get(0);
+		$(this).remove();
+		p.normalize(); // it's important to do the normalise to merge separated text nodes
+	});
+}
+
 wr.PageAnalyzer.prototype.clearHighlighting = function(keepData){
-	if (keepData){
-		for(var id in this.highlights){
-			this.deleteHt(id, true);
-		}
-	}else{
+	for(var id in this.highlights){
+		this.deleteHt(id, true);
+	}
+	if (!keepData){
 		this.highlights = {};
 		this.save();
 	}
