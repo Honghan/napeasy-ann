@@ -6,7 +6,7 @@ if (typeof qbb == "undefined"){
 	if(typeof qbb.inf == "undefined") {
 
 		qbb.inf = {
-			annotator: 'pubAnnotator2017',
+			annotator: 'pubUser',
 			service_url: "https://napeasy.org/napeasy_api/api",
 
 			saveAnn: function(url, anns, searchCB){
