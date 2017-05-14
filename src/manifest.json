@@ -2,7 +2,7 @@
   "name": "NapEasy-ANN",
   "manifest_version": 2,
   "version": "1.0",
-  "description": "NapEasy Annotator",
+  "description": "NapEasy Annotator by Honghan Wu @PHI KCL",
   "icons": {"128": "wr.png"},
   "browser_action": {
     "default_icon": "wr.png",
@@ -10,8 +10,7 @@
   },
   "content_security_policy": "script-src 'self' https://napeasy.org; object-src 'self'",
   "background": {
-    "scripts": ["libs/jquery-latest.pack.js", "libs/jquery.json-2.2.min.js", "wr.js", "api.js"],
-    "persistent": false
+    "page": "background.html"
   },
   "permissions": [
     "cookies", "tabs", "http://napeasy.org/"

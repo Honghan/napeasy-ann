@@ -6,13 +6,14 @@ if (typeof qbb == "undefined"){
 	if(typeof qbb.inf == "undefined") {
 
 		qbb.inf = {
+			annotator: 'pubUser',
 			service_url: "https://napeasy.org/napeasy_api/api",
 
 			saveAnn: function(url, anns, searchCB){
 				var apiName = "saveNapEasyAnnotation";
 				var sendObject={
 						r:apiName,
-	                    annotator: 'kclMScProject2017',
+	                    annotator: qbb.inf.annotator,
 	                    url: url,
 	                    anns: anns
 				};
@@ -23,7 +24,7 @@ if (typeof qbb == "undefined"){
 				var apiName = "loadNapEasyAnnotation";
 				var sendObject={
 						r:apiName,
-	                    annotator: 'kclMScProject2017',
+	                    annotator: qbb.inf.annotator,
 	                    url: url
 				};
 				qbb.inf.callAPI(sendObject, searchCB);
@@ -63,7 +64,7 @@ if (typeof qbb == "undefined"){
 							   url: url || qbb.inf.service_url,
 							   data: sendData || [],
 							   cache: false,
-							   dataType: "jsonp", /* use "html" for HTML, use "json" for non-HTML */
+							   dataType: "json", /* use "html" for HTML, use "json" for non-HTML */
 							   success: dataSuccess /* (data, textStatus, jqXHR) */ || null,
 							   error: error /* (jqXHR, textStatus, errorThrown) */ || null
 						});
