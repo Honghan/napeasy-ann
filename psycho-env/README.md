@@ -1,5 +1,5 @@
 # Psycho-Env Corpus 
-The Psycho-env corpus is produced to facilitate knowledge discovery on correlating mental diseases and environmental factors. It is  dedicated to curating the associations between mental illnesses and environmental factors from published literature. 
+The Psycho-env corpus is produced to facilitate knowledge discovery on correlating mental diseases and environmental factors. It is a database manually curated from the published studies including research articles, clinical trials and case reports.
 
 Update:
 * NapEasy Annotator v1.0 has been implemented for supporting browser based annotation. Although it should work for any
