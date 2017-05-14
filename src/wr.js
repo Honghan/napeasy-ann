@@ -1,4 +1,4 @@
-//SmartPresenter robot namespace
+//namespace
 var wr = wr || {};
 
 chrome.runtime.onMessage.addListener(
@@ -23,6 +23,11 @@ wr.AnnService.prototype.doRequest = function(request){
 		this.loadAnn(request.data.url, function(s){
 			thisObj.sendMessage({action: "annData", message: s});
 		});
+	}
+
+	if (request.action == 'setAnn'){
+		qbb.inf.annoator = request.data.annotator;
+		this.sendMessage({action: "message", message: "annotator set as [" + request.data.annotator + "]"});
 	}
 }
 
