@@ -15,7 +15,7 @@
 	text-shadow: rgb(3, 3, 3) 2px 2px 4px;
 }
 .nea_ctls{
-	display: fixed;
+	display:fixed;
 	right: 0px;
 }
 .nea_ht{
@@ -74,5 +74,5 @@
 }
 #nea_pop span:hover{
 	color:#682896;
-};
+}
 
