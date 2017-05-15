@@ -1,31 +1,31 @@
 BD I or II in the depressed phase
-DSM-IV criteria
-Depression
-Depressive symptoms
-affective disorders
-at least mild depressive symptoms
-bipolar I disorder
-bipolar affective disorder
-bipolar depression
-bipolar disorder
-bipolar disorder (BD)
-depression
-depressive and non-depressive
-depressive illness
-depressive illnesses
-major depressive disorder
-major depressive episode without psychotic features
-mania
-manic-depressive
-mixed episode
+DSM-IV criteria C3710316
+Depression  C0011570
+Depressive symptoms C0011570
+affective disorders C0001723
+at least mild depressive symptoms   C0494397
+bipolar I disorder  C0853193
+bipolar affective disorder  C0005586
+bipolar depression  C0005586
+bipolar disorder    C0005586
+bipolar disorder (BD)   C0005586
+depression  C0011570
+depressive and non-depressive   C0011570
+depressive illness  C0011570
+depressive illnesses    C0011570
+major depressive disorder   C0011581
+major depressive episode without psychotic features C0011581
+mania   C0338831
+manic-depressive    C1852198
+mixed episode   C2939428
 non-SAD depressive disorders
 non-seasonal depression
-rapid cycling bipolar
-rapid cycling bipolar disorder
-rapidly cycling bipolar illness
-recurrent depression
-seasonal depression
-single depressive episode
-the Center for Epidemiologic Studies Depression Scale
-unipolar
+rapid cycling bipolar   C2063820
+rapid cycling bipolar disorder  C2063820
+rapidly cycling bipolar illness C2063820
+recurrent depression    C0221480
+seasonal depression C0085159
+single depressive episode   C0024517
+the Center for Epidemiologic Studies Depression Scale   C2699160
+unipolar    C1269683
 unipolar and bipolar depressions

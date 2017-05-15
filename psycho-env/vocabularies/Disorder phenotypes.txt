@@ -1,21 +1,21 @@
-Cognitive function
+Cognitive function  C0392335
 Length of hospitalization
-Melatonin
-The onset of bipolar disorder
-age of onset
-age of onset of bipolar disorder
+Melatonin   C0025219
+The onset of bipolar disorder   C0206132
+age of onset    C0206132
+age of onset of bipolar disorder    C0206132
 depressive episodes
 dose-ranging safety and efficacy
-effect of morning light therapy or placebo combined with citalopram
-interleukin 6 (IL-6) levels
+effect of morning light therapy or placebo combined with citalopram C0031765
+interleukin 6 (IL-6) levels C0021764
 lengths of stay
-mood
-mood ratings
-mood swings
-number of hospitalizations
-onsets of his depression
-outcomes during hospitalization
-plasma melatonin levels
+mood    C0026516
+mood ratings    C0085633
+mood swings C0085633
+number of hospitalizations  CL502747
+onsets of his depression    C0206132
+outcomes during hospitalization C1274040
+plasma melatonin levels C0025219
 response of bipolar spectrum versus unipolar patients to treatment with light therapy
 the first manic episodes
-timing and duration of sleep
+timing and duration of sleep    C0424574
