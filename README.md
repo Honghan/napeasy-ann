@@ -4,7 +4,7 @@ This repo constains two resources:
 * [psycho-env corpus](psycho-env): Psycho-env corpus is a database manually curated from the published literature for studying the associations between mental illnesses and environmental factors. 
 
 Update:
-* NapEasy Annotator v1.0 has been implemented for supporting browser based annotation. Although it should work for any
+* PsychoEnv-Ann Annotator v1.0 has been implemented for supporting browser based annotation. Although it should work for any
 web pages, it has been developed and tested on PubMed articles.
 * 20 articles have been identified for 4 sub-domains of associating mental illness with environmental factors
 * Abstracts of the 20 articles have been annotated and uploaded
