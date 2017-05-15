@@ -31,9 +31,10 @@ Essentially, the annotation line is tab-separated and has 6 columns. The columns
 | -------------------- | --------------- | ------------ | ---------- | ---- | ---- |
 | ABSTRACTTEXT:eq(1) | 0 | 589 | 624 | 3 times a day during the first week | Data collection method |
 
+3. [instances of all annotation types](vocabularies) - contains the instances of 8 typed annotations.
 
 ### Reference
 [1] Fung, WL Alan, Dinesh Bhugra, and Peter B. Jones. "Ethnicity and mental health: the example of schizophrenia in migrant populations across Europe." Psychiatry 5.11 (2006): 396-401.
-[2] Rutter, Michael. "How the environment affects mental health."  The British Journal of Psychiatry 
-(2005).
+
+[2] Rutter, Michael. "How the environment affects mental health."  The British Journal of Psychiatry (2005).
 
