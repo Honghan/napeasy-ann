@@ -29,7 +29,7 @@ wr.PageAnalyzer.prototype.init = function(){
 		' <button id="btnClear">Remove All Annotations</button></div>'
 		//' </div>'
 		);
-	$('body').append('<div id="nea_pop"><input type="text"/><span id="btnOk">ok</span><span id="btnDel">del</span></div>');
+	$('body').append('<nappop id="nea_pop"><input type="text"/><span id="btnOk">ok</span><span id="btnDel">del</span></nappop>');
 	var thisObj = this;
 
 	$('#btnClear').click(function(){
@@ -118,8 +118,13 @@ wr.PageAnalyzer.prototype.getSelection = function(){
 			//TODO: to support a selection crossing multiple elements
 			// selected.push(this.getSelectedObject(selection.anchorNode, selection.anchorOffset, -1));
 			// selected.push(this.getSelectedObject(selection.focusNode, 0, selection.focusOffset));
-			this.showMessage('sorry: selection across multiple elements or overlapping with existing ones is not supported');
-			return;
+			// this.showMessage('sorry: selection across multiple elements or overlapping with existing ones is not supported');
+			// return;
+            var spannedObjects = this.getSpanSelections(selection.anchorNode, selection.anchorOffset,
+                selection.focusNode, selection.focusOffset);
+            for(var i=0;i<spannedObjects.length;i++){
+                selected.push(this.getSelectedObject(spannedObjects[i].elem, spannedObjects[i].s, spannedObjects[i].e));
+			}
 		}
 		var selectObject = {"selected": selected, "meta": ""};
 		selectObject.id = this.getMD5HtObject(selectObject);
@@ -133,6 +138,70 @@ wr.PageAnalyzer.prototype.getSelection = function(){
 	return selection;
 };
 
+wr.PageAnalyzer.prototype.getLowerestCommonAncestor = function(elem1, elem2){
+	var a1 = $(elem1).parents();
+    var a2 = $(elem2).parents();
+    for(var i=0;i<a1.length;i++){
+        if(jQuery.inArray(a1[i], a2) != -1){
+        	return a1[i];
+		}
+	}
+	return null;
+}
+
+wr.PageAnalyzer.prototype.getSpanSelections = function(elem1, elem1Start, elem2, elem2End){
+   var p = this.getLowerestCommonAncestor(elem1, elem2);
+   var sels = [];
+   var inRange = false;
+   for (var i=0;i<p.childNodes.length;i++){
+   		if (p.childNodes[i].nodeType != 1 && p.childNodes[i].nodeType != 3)
+   			continue;
+   		if (p.childNodes[i] == elem1){
+            inRange = true;
+            sels.push({"elem": p.childNodes[i], "s": elem1Start, "e": p.childNodes[i].nodeValue.length});
+            continue;
+		}else if (p.childNodes[i] == elem2){
+            sels.push({"elem": p.childNodes[i], "s": 0, "e": elem2End});
+            break;
+		}
+		if (inRange){
+            sels = sels.concat(this.getFullTextNodes(p.childNodes[i]));
+		}
+   }
+   return sels;
+}
+
+wr.PageAnalyzer.prototype.getFullTextNodes = function(elem){
+	if (elem.nodeType == 3){
+		return [{"elem": elem, "s":0, "e": elem.nodeValue.length}];
+	}else if(elem.nodeType == 1){
+		var texts = [];
+		for(var i=0;i<elem.childNodes.length;i++){
+			if (elem.childNodes[i].nodeType == 3){
+                texts.push({"elem": elem.childNodes[i], "s":0, "e": elem.childNodes[i].nodeValue.length});
+			}else{
+                texts = texts.concat(this.getFullTextNodes(elem.childNodes[i]));
+			}
+		}
+		return texts;
+	}
+	return [];
+}
+
+wr.PageAnalyzer.prototype.shouldSkipSelection = function(elem){
+	var skipElems = [];
+	skipElems.push($('#nea_pop').get(0));
+    skipElems.push($('#nea_message').get(0));
+    skipElems.push($('#nea_logo').get(0));
+    var p = $(elem).parents();
+    for(var i=0;i<skipElems.length;i++){
+        if(jQuery.inArray(skipElems[i], p) != -1){
+            return true;
+        }
+	}
+	return false;
+}
+
 wr.PageAnalyzer.prototype.save = function(){
 	var thisObj = this;
 	chrome.runtime.sendMessage({action: "save", data: {url:window.location.href, anns: $.toJSON(this.highlights)}}, function(response) {
@@ -141,6 +210,10 @@ wr.PageAnalyzer.prototype.save = function(){
 }
 
 wr.PageAnalyzer.prototype.getSelectedObject = function(node, start, end){
+	if (this.shouldSkipSelection(node)) {
+		console.log("selected unselectable");
+        return null;
+    }
 	var loc = this.getLocatorByAttrs(node);
 	if (loc){
 		return this.getHTObject(node, loc, start, end);
@@ -210,7 +283,7 @@ wr.PageAnalyzer.prototype.getLocatorByAttrs = function(elem){
 		attr = this.locAttrs[i];
 		if ($(node).attr(attr) && $(node).attr(attr).length > 0){
 			if (attr == "class"){
-				loc = tagName + "." + $(node).attr(attr);
+				loc = tagName + "." + $(node).attr(attr).replace(/ /ig, ".");
 			}else if (attr == "id"){
 				loc = "#" + $(node).attr(attr);
 			}else
@@ -265,7 +338,7 @@ wr.PageAnalyzer.prototype.highlighting = function(obj){
 			var s = htObjs[i].start;
 			var e = htObjs[i].end == -1 ? htObjs[i].obj.nodeValue.length : htObjs[i].end;
 			var preText = document.createTextNode(htObjs[i].obj.nodeValue.substring(0, s));
-			var htText = document.createElement("em");
+			var htText = document.createElement("napann");
 			$(htText).addClass('nea_ht');
 			$(htText).addClass(obj.id);
 			$(htText).attr("nea_ht_id", obj.id);
@@ -353,7 +426,7 @@ wr.PageAnalyzer.prototype.highlightingAll = function(){
 					var preText = document.createTextNode(domObj.nodeValue.substring(prevEnd, s));
 					newDomList.push(preText);
 				}				
-				var htText = document.createElement("em");
+				var htText = document.createElement("napann");
 				$(htText).addClass('nea_ht');
 				$(htText).addClass(ho.htId);
 				$(htText).attr("nea_ht_id", ho.htId);
@@ -377,9 +450,12 @@ wr.PageAnalyzer.prototype.highlightingAll = function(){
 			if ($(newDom).hasClass('nea_ht')){
 				var htObj = this.highlights[$(newDom).attr('nea_ht_id')]['selected'][0];
 				var h = $(newDom).height();
-				$(newDom).append('<span class="nea_label"></span>');
-				$(newDom).find('.nea_label').html(this.highlights[$(newDom).attr('nea_ht_id')].meta);
-				$(newDom).find('.nea_label').css('bottom', h);
+                var firstElem = $('.' + $(newDom).attr("nea_ht_id")).get(0);
+				$(firstElem).append('<naplabel class="nea_label"></naplabel>');
+				$(firstElem).find('.nea_label').html(this.highlights[$(newDom).attr('nea_ht_id')].meta);
+                $(firstElem).find('.nea_label').css('bottom', h);
+				// $(newDom).find('.nea_label').html(this.highlights[$(newDom).attr('nea_ht_id')].meta);
+				// $(newDom).find('.nea_label').css('bottom', h);
 			}
 			prevDom = newDom;
 		}
